@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inicio de Sesión</title>
   <style>
     body {
@@ -22,6 +22,8 @@
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       text-align: center;
+      width: 90%;
+      max-width: 400px;
     }
 
     .logo-img {
@@ -38,16 +40,21 @@
     input[type="text"] {
       padding: 10px;
       width: 100%;
-      max-width: 300px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 5px;
       margin-top: 15px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .hidden-submit {
       display: none;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+      font-size: 15px;
     }
   </style>
 </head>
@@ -55,7 +62,6 @@
 
   <div class="container">
     <form onsubmit="verificarUsuario(); return false;">
-      <!-- Imagen como botón de ingresar -->
       <img 
         src="https://cdn.create.vista.com/api/media/small/84022132/stock-photo-bar-loading-with-the-text-jesus" 
         alt="Ingresar" 
@@ -63,29 +69,34 @@
         onclick="verificarUsuario()"
       >
 
-      <!-- Campo para ingresar el nombre de usuario -->
-      <br>
-      <input type="text" id="usuario" placeholder="Nombre de usuario">
-      <input type="submit" class="hidden-submit">
+      <input type="text" id="usuario" placeholder="Nombre de usuario" autocomplete="off" />
+      <input type="submit" class="hidden-submit" />
+
+      <div id="mensajeError" class="error-message"></div>
     </form>
   </div>
 
   <script>
     function verificarUsuario() {
       const usuarioIngresado = document.getElementById('usuario').value.trim().toLowerCase();
+      const mensajeError = document.getElementById('mensajeError');
       const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-      const puedeIngresar = usuarios.some(u =>
-        (typeof u === 'object' && u.nombre === usuarioIngresado && u.acceso !== false) ||
-        (typeof u === 'string' && u === usuarioIngresado) // Compatibilidad con usuarios antiguos
+      let usuario = usuarios.find(u => 
+        typeof u === 'object' && u.nombre === usuarioIngresado && u.acceso !== false
       );
 
       if (usuarioIngresado === 'jbenjamin') {
-        window.location.href = 'inicio.html'; // admin siempre accede
-      } else if (puedeIngresar) {
+        localStorage.setItem('usuarioActual', JSON.stringify({
+          nombre: 'jbenjamin',
+          nombreVisible: 'Administrador'
+        }));
+        window.location.href = 'inicio.html';
+      } else if (usuario) {
+        localStorage.setItem('usuarioActual', JSON.stringify(usuario));
         window.location.href = 'inicio.html';
       } else {
-        alert('Acceso denegado. Usuario inválido o sin permiso.');
+        mensajeError.textContent = 'Acceso denegado. Usuario inválido o sin permiso.';
       }
     }
   </script>
