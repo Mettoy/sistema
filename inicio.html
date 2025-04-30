@@ -2,118 +2,81 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inicio</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f9f9f9;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
     }
 
-    /* Sidebar */
-    .sidebar {
-      height: 100vh;
-      width: 250px;
-      position: fixed;
-      top: 0;
-      left: 0;
+    .topbar {
       background-color: #2c3e50;
-      padding-top: 60px;
-      transition: 0.3s;
+      color: white;
+      padding: 10px 20px;
+      text-align: right;
+      font-size: 16px;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #34495e;
+      position: fixed;
+      top: 50px;
+      left: 0;
+      bottom: 0;
+      padding: 20px;
+      color: white;
     }
 
     .sidebar a {
-      padding: 15px 25px;
-      text-decoration: none;
-      font-size: 18px;
-      color: #ecf0f1;
       display: block;
-      transition: 0.3s;
-    }
-
-    .sidebar a:hover {
-      background-color: #34495e;
-    }
-
-    /* Top navigation */
-    .topbar {
-      height: 60px;
-      width: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #34495e;
       color: white;
-      display: flex;
-      align-items: center;
-      padding-left: 270px;
-      font-size: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-decoration: none;
+      margin: 10px 0;
     }
 
-    /* Main content */
-    .main {
-      margin-left: 250px;
-      margin-top: 60px;
-      padding: 30px;
-    }
-
-    .card {
-      background-color: white;
+    .content {
+      margin-left: 220px;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      max-width: 800px;
-      margin: auto;
     }
 
-    .card h2 {
-      margin-top: 0;
-      color: #2c3e50;
-    }
-
-    @media screen and (max-width: 768px) {
-      .sidebar {
-        width: 200px;
-      }
-
-      .topbar {
-        padding-left: 210px;
-      }
-
-      .main {
-        margin-left: 200px;
-      }
+    .nombre-usuario {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <!-- Menú lateral -->
-  <div class="sidebar">
-    <a href="inicio.html">🏠 Inicio</a>
-    <a href="agregar.html">➕ Agregar Usuario</a>
-    <a href="#">🔧 Configuración</a>
-    <a href="#">🚪 Cerrar Sesión</a>
-  </div>
-
-  <!-- Barra superior -->
   <div class="topbar">
-    Panel de Control - Bienvenido
+    Bienvenido, <span id="nombreUsuario" class="nombre-usuario">Cargando...</span>
   </div>
 
-  <!-- Contenido principal -->
-  <div class="main">
-    <div class="card">
-      <h2>Inicio</h2>
-      <p>Bienvenido al panel principal. Usa el menú lateral para navegar por las funciones disponibles, como agregar usuarios o acceder a la configuración.</p>
-    </div>
+  <div class="sidebar">
+    <h3>Menú</h3>
+    <a href="inicio.html">Inicio</a>
+    <a href="agregar.html">Agregar Usuario</a>
   </div>
+
+  <div class="content">
+    <h2>Inicio</h2>
+    <p>Esta es la página de bienvenida.</p>
+  </div>
+
+  <script>
+    window.onload = function () {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
+      const nombreSpan = document.getElementById('nombreUsuario');
+
+      if (usuario && usuario.nombreVisible) {
+        nombreSpan.textContent = usuario.nombreVisible;
+      } else if (usuario && usuario.nombre) {
+        nombreSpan.textContent = usuario.nombre;
+      } else {
+        nombreSpan.textContent = "Invitado";
+      }
+    };
+  </script>
 
 </body>
 </html>
