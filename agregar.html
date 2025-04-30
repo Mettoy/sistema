@@ -2,56 +2,144 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Agregar Usuarios</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
     }
 
     input[type="text"] {
       padding: 10px;
-      margin-right: 10px;
-      width: 300px;
+      width: 80%;
       font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
     button {
       padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
       font-size: 16px;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
 
+    button:hover {
+      background-color: #218838;
+    }
+
+    /* List and delete button styling */
     ul {
+      list-style-type: none;
+      padding-left: 0;
       margin-top: 20px;
     }
 
     li {
-      margin-bottom: 5px;
+      background-color: #ecf0f1;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 5px;
+    }
+
+    li button {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    li button:hover {
+      background-color: #c0392b;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      input[type="text"] {
+        width: 70%;
+      }
+
+      button {
+        width: 25%;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Agregar usuarios autorizados</h2>
-  <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario (sin espacios)">
-  <button onclick="agregarUsuario()">Agregar</button>
 
-  <h3>Usuarios registrados:</h3>
-  <ul id="listaUsuarios"></ul>
+  <div class="container">
+    <h2>Agregar usuarios autorizados</h2>
+
+    <div class="input-container">
+      <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario (sin espacios)">
+      <button onclick="agregarUsuario()">Agregar</button>
+    </div>
+
+    <h3>Usuarios registrados:</h3>
+    <ul id="listaUsuarios"></ul>
+  </div>
 
   <script>
+    // Función para cargar los usuarios registrados
     function cargarUsuarios() {
       const lista = document.getElementById('listaUsuarios');
       const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-      lista.innerHTML = '';
-      usuarios.forEach(user => {
+      lista.innerHTML = ''; // Limpiar la lista antes de cargarla
+
+      // Mostrar cada usuario en la lista
+      usuarios.forEach((user, index) => {
         const li = document.createElement('li');
-        li.textContent = user;
+        // Si el usuario es "admon", no se podrá eliminar
+        if (user === 'admon') {
+          li.innerHTML = `${user} (Administrador - No se puede eliminar)`;
+        } else {
+          li.innerHTML = `${user} <button onclick="borrarUsuario(${index})">Eliminar</button>`;
+        }
         lista.appendChild(li);
       });
     }
 
+    // Función para agregar un nuevo usuario
     function agregarUsuario() {
       const input = document.getElementById('nuevoUsuario');
       let usuario = input.value.trim().toLowerCase();
@@ -63,17 +151,37 @@
 
       let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
+      // Comprobamos si el usuario ya existe
       if (usuarios.includes(usuario)) {
         alert("El usuario ya está registrado.");
       } else {
         usuarios.push(usuario);
         localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        input.value = "";
+        input.value = ""; // Limpiar el campo de entrada
         cargarUsuarios();
       }
     }
 
+    // Función para borrar un usuario
+    function borrarUsuario(index) {
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      let usuarioAEliminar = usuarios[index];
+
+      // No se puede eliminar el usuario "admon"
+      if (usuarioAEliminar === 'admon') {
+        alert("No puedes eliminar al usuario 'admon'.");
+        return;
+      }
+
+      // Eliminar usuario de la lista
+      usuarios.splice(index, 1);
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      cargarUsuarios();
+    }
+
+    // Cargar los usuarios cuando la página se carga
     window.onload = cargarUsuarios;
   </script>
+
 </body>
 </html>
