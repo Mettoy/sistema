@@ -2,82 +2,92 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Página de Inicio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de Sesión</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f0f0;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
       margin: 0;
     }
 
-    .login-container {
-      background-color: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
 
-    .login-container img {
-      width: 200px;
-      height: auto;
+    .logo-img {
+      width: 250px;
       margin-bottom: 20px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .logo-img:hover {
+      transform: scale(1.05);
     }
 
     input[type="text"] {
-      width: 80%;
       padding: 10px;
-      margin-bottom: 15px;
+      width: 100%;
+      max-width: 300px;
+      font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
+      border-radius: 5px;
+      margin-top: 15px;
+      margin-bottom: 20px;
     }
 
-    button {
-      padding: 10px 20px;
-      background-color: #28a745;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
+    .hidden-submit {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <img src="https://cdn.create.vista.com/api/media/small/84022132/stock-photo-bar-loading-with-the-text-jesus" alt="Dios te bendiga">
-    <input type="text" id="usuario" placeholder="Ingresa tu nombre de usuario">
-    <br>
-    <button onclick="ingresar()">Ingresar</button>
+
+  <div class="container">
+    <form onsubmit="verificarUsuario(); return false;">
+      <!-- Imagen como botón de ingresar -->
+      <img 
+        src="https://cdn.create.vista.com/api/media/small/84022132/stock-photo-bar-loading-with-the-text-jesus" 
+        alt="Ingresar" 
+        class="logo-img"
+        onclick="verificarUsuario()"
+      >
+
+      <!-- Campo para ingresar el nombre de usuario -->
+      <br>
+      <input type="text" id="usuario" placeholder="Nombre de usuario">
+      <input type="submit" class="hidden-submit">
+    </form>
   </div>
 
   <script>
     function verificarUsuario() {
-  const usuarioIngresado = document.getElementById('usuario').value.toLowerCase();
-  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      const usuarioIngresado = document.getElementById('usuario').value.trim().toLowerCase();
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-  // Buscar usuario por su campo .nombre
-  const existe = usuarios.some(u => 
-    (typeof u === 'string' && u === usuarioIngresado) || // por compatibilidad
-    (typeof u === 'object' && u.nombre === usuarioIngresado)
-  );
+      const existe = usuarios.some(u =>
+        (typeof u === 'string' && u === usuarioIngresado) ||
+        (typeof u === 'object' && u.nombre === usuarioIngresado)
+      );
 
-  if (usuarioIngresado === 'jbenjamin' || existe) {
-    window.location.href = "inicio.html";
-  } else {
-    alert("Usuario sin acceso.");
-  }
-}
-
+      // Solo jbenjamin es el administrador
+      if (usuarioIngresado === 'jbenjamin' || existe) {
+        window.location.href = 'inicio.html';
+      } else {
+        alert('Usuario inválido.');
+      }
+    }
   </script>
+
 </body>
 </html>
