@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Usuarios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      margin-right: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    ul {
+      margin-top: 20px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Agregar usuarios autorizados</h2>
+  <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario (sin espacios)">
+  <button onclick="agregarUsuario()">Agregar</button>
+
+  <h3>Usuarios registrados:</h3>
+  <ul id="listaUsuarios"></ul>
+
+  <script>
+    function cargarUsuarios() {
+      const lista = document.getElementById('listaUsuarios');
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+      lista.innerHTML = '';
+      usuarios.forEach(user => {
+        const li = document.createElement('li');
+        li.textContent = user;
+        lista.appendChild(li);
+      });
+    }
+
+    function agregarUsuario() {
+      const input = document.getElementById('nuevoUsuario');
+      let usuario = input.value.trim().toLowerCase();
+
+      if (usuario === "") {
+        alert("Debes escribir un nombre de usuario.");
+        return;
+      }
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+      if (usuarios.includes(usuario)) {
+        alert("El usuario ya está registrado.");
+      } else {
+        usuarios.push(usuario);
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        input.value = "";
+        cargarUsuarios();
+      }
+    }
+
+    window.onload = cargarUsuarios;
+  </script>
+</body>
+</html>
