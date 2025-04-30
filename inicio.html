@@ -3,9 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>Inicio</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Menú lateral */
+    .sidebar {
+      height: 100vh;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #333;
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+
+    .sidebar a {
+      padding: 15px 25px;
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+    }
+
+    .openbtn {
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #333;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+    }
+
+    .main {
+      margin-left: 0;
+      padding: 20px;
+      transition: margin-left 0.3s;
+    }
+  </style>
 </head>
 <body>
-  <h1>Bienvenido a la página de inicio</h1>
-  <p>Has iniciado sesión correctamente.</p>
+
+  <!-- Botón para abrir/cerrar el menú -->
+  <button class="openbtn" onclick="toggleSidebar()">☰ Menú</button>
+
+  <!-- Menú lateral -->
+  <div id="sidebar" class="sidebar">
+    <a href="agregar.html">Agregar Persona</a>
+    <a href="#">Opción 2</a>
+    <a href="#">Cerrar Sesión</a>
+  </div>
+
+  <!-- Contenido principal -->
+  <div id="main" class="main">
+    <h1>Bienvenido a la página de inicio</h1>
+    <p>Usa el menú lateral para navegar.</p>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const main = document.getElementById("main");
+
+      if (sidebar.style.left === "0px") {
+        sidebar.style.left = "-250px";
+        main.style.marginLeft = "0";
+      } else {
+        sidebar.style.left = "0";
+        main.style.marginLeft = "250px";
+      }
+    }
+  </script>
+
 </body>
 </html>
