@@ -11,7 +11,9 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
+
     .login-container {
       background-color: white;
       padding: 30px;
@@ -19,6 +21,7 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
+
     input[type="text"] {
       width: 80%;
       padding: 10px;
@@ -26,26 +29,28 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    button {
-      padding: 10px 20px;
-      background-color: #007BFF;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      font-size: 16px;
+
+    .img-btn {
+      width: 100%;
+      max-width: 300px;
       cursor: pointer;
+      transition: transform 0.2s;
     }
-    button:hover {
-      background-color: #0056b3;
+
+    .img-btn:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <h2>Iniciar Sesión</h2>
-    <input type="text" placeholder="Usuario" id="usuario">
-    <br>
-    <button onclick="ingresar()">Ingresar</button>
+    <input type="text" placeholder="Usuario" id="usuario"><br>
+    <img 
+      src="https://media.istockphoto.com/id/1291981309/es/vector/bienvenido-banner-burbuja-de-voz-etiqueta-plantilla-de-cinta-ilustraci%C3%B3n-de-vectores-de-stock.jpg?s=612x612&w=0&k=20&c=pJsu00yX5yVd4hUf_YEd-yczOSlT8GTmjIstcXM2S_8=" 
+      alt="Bienvenido" 
+      class="img-btn" 
+      onclick="ingresar()"
+    >
   </div>
 
   <script>
@@ -54,7 +59,7 @@
       if (usuario.trim() === "") {
         alert("Por favor, ingresa un nombre de usuario.");
       } else {
-        alert("Bienvenido, " + usuario + "!");
+        window.location.href = "inicio.html";
       }
     }
   </script>
