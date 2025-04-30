@@ -22,46 +22,64 @@
       text-align: center;
     }
 
+    .login-container img {
+      width: 200px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
     input[type="text"] {
       width: 80%;
       padding: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 4px;
+      font-size: 16px;
     }
 
-    .img-btn {
-      width: 100%;
-      max-width: 300px;
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
-      transition: transform 0.2s;
     }
 
-    .img-btn:hover {
-      transform: scale(1.05);
+    button:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <input type="text" placeholder="Usuario" id="usuario"><br>
-    <img 
-      src="https://media.istockphoto.com/id/1291981309/es/vector/bienvenido-banner-burbuja-de-voz-etiqueta-plantilla-de-cinta-ilustraci%C3%B3n-de-vectores-de-stock.jpg?s=612x612&w=0&k=20&c=pJsu00yX5yVd4hUf_YEd-yczOSlT8GTmjIstcXM2S_8=" 
-      alt="Bienvenido" 
-      class="img-btn" 
-      onclick="ingresar()"
-    >
+    <img src="https://cdn.create.vista.com/api/media/small/84022132/stock-photo-bar-loading-with-the-text-jesus" alt="Dios te bendiga">
+    <input type="text" id="usuario" placeholder="Ingresa tu nombre de usuario">
+    <br>
+    <button onclick="ingresar()">Ingresar</button>
   </div>
 
   <script>
     function ingresar() {
-      const usuario = document.getElementById('usuario').value;
-      if (usuario.trim() === "") {
+      const usuario = document.getElementById('usuario').value.trim();
+
+      if (usuario === "") {
         alert("Por favor, ingresa un nombre de usuario.");
-      } else {
+        return;
+      }
+
+      // Aceptamos 'JMETTOY' o cualquier otro usuario para este ejemplo
+      // Si quieres que solo JMETTOY y los usuarios registrados pasen, necesitarás un backend o base de datos
+
+      // Si es JMETTOY (sin importar mayúsculas/minúsculas) o cualquier otro, redirige
+      if (usuario.toLowerCase() === "jmettoy" || usuario !== "") {
         window.location.href = "inicio.html";
+      } else {
+        alert("Usuario no autorizado.");
       }
     }
   </script>
 </body>
 </html>
+
