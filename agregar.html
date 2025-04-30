@@ -10,9 +10,9 @@
       margin: 0;
       background-color: #f7f7f7;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: flex-start;
       height: 100vh;
+      padding-left: 220px; /* Añadido espacio para el menú */
     }
 
     .container {
@@ -55,6 +55,38 @@
 
     button:hover {
       background-color: #218838;
+    }
+
+    /* Estilos del menú pegable */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 200px;
+      background-color: #2c3e50;
+      padding-top: 20px;
+      padding-left: 20px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #1abc9c;
     }
 
     /* List and delete button styling */
@@ -106,6 +138,12 @@
 </head>
 <body>
 
+  <!-- Menú pegable -->
+  <div class="sidebar">
+    <a href="agregar.html">Agregar Usuario</a>
+    <a href="index.html">Ir a inicio</a>
+  </div>
+
   <div class="container">
     <h2>Agregar usuarios autorizados</h2>
 
@@ -129,11 +167,14 @@
       // Mostrar cada usuario en la lista
       usuarios.forEach((user, index) => {
         const li = document.createElement('li');
+        let userName = user.nombre || user; // Si el usuario tiene un nombre asignado, mostrarlo
+
         // Si el usuario es "admon", no se podrá eliminar
         if (user === 'admon') {
-          li.innerHTML = `${user} (Administrador - No se puede eliminar)`;
+          li.innerHTML = `${userName} (Administrador - No se puede eliminar)`;
         } else {
-          li.innerHTML = `${user} <button onclick="borrarUsuario(${index})">Eliminar</button>`;
+          li.innerHTML = `${userName} <button onclick="borrarUsuario(${index})">Eliminar</button>
+                          <button onclick="asignarPermiso(${index})">Asignar Permiso</button>`;
         }
         lista.appendChild(li);
       });
@@ -152,10 +193,10 @@
       let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
       // Comprobamos si el usuario ya existe
-      if (usuarios.includes(usuario)) {
+      if (usuarios.find(u => u === usuario || u.nombre === usuario)) {
         alert("El usuario ya está registrado.");
       } else {
-        usuarios.push(usuario);
+        usuarios.push({ nombre: usuario, permisos: [] }); // Guardar usuario como objeto con permisos
         localStorage.setItem('usuarios', JSON.stringify(usuarios));
         input.value = ""; // Limpiar el campo de entrada
         cargarUsuarios();
@@ -168,7 +209,7 @@
       let usuarioAEliminar = usuarios[index];
 
       // No se puede eliminar el usuario "admon"
-      if (usuarioAEliminar === 'admon') {
+      if (usuarioAEliminar.nombre === 'admon') {
         alert("No puedes eliminar al usuario 'admon'.");
         return;
       }
@@ -177,6 +218,22 @@
       usuarios.splice(index, 1);
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
       cargarUsuarios();
+    }
+
+    // Función para asignar permisos a un usuario
+    function asignarPermiso(index) {
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      let usuario = usuarios[index];
+
+      // Pedir al usuario qué permiso desea asignar
+      let permiso = prompt(`Asignar permiso a ${usuario.nombre}:`);
+
+      if (permiso) {
+        // Asignar permiso al usuario
+        usuario.permisos.push(permiso);
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        cargarUsuarios();
+      }
     }
 
     // Cargar los usuarios cuando la página se carga
