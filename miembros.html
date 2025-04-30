@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miembros</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .topbar {
+      background-color: #2c3e50;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 50px;
+    }
+
+    .topbar .title {
+      font-size: 18px;
+    }
+
+    .topbar .usuario {
+      font-weight: bold;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #34495e;
+      position: fixed;
+      top: 50px;
+      bottom: 0;
+      left: 0;
+      padding-top: 20px;
+      color: white;
+    }
+
+    .sidebar a, .sidebar button {
+      display: block;
+      padding: 12px 20px;
+      color: white;
+      text-decoration: none;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .sidebar a:hover,
+    .sidebar button:hover {
+      background-color: #3c5a72;
+    }
+
+    .content {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .user-entry {
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .user-controls button {
+      margin-right: 5px;
+    }
+
+    .disabled {
+      color: red;
+    }
+
+    .enabled {
+      color: green;
+    }
+
+    .permisos-box {
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="title">Gestión de Miembros</div>
+    <div class="usuario">Bienvenido, <span id="nombreUsuario">...</span></div>
+  </div>
+
+  <div class="sidebar">
+    <a href="inicio.html">Inicio</a>
+    <a href="agregar.html">Agregar Usuario</a>
+    <a href="miembros.html">Miembros</a>
+    <button onclick="cerrarSesion()">Cerrar Sesión</button>
+  </div>
+
+  <div class="content">
+    <h2>Miembros Registrados</h2>
+    <div id="listaMiembros"></div>
+  </div>
+
+  <script>
+    window.onload = function () {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
+      const span = document.getElementById('nombreUsuario');
+
+      if (usuario && usuario.nombreVisible) {
+        span.textContent = usuario.nombreVisible;
+      } else if (usuario && usuario.nombre) {
+        span.textContent = usuario.nombre;
+      } else {
+        span.textContent = "Invitado";
+      }
+
+      cargarMiembros();
+    };
+
+    function cargarMiembros() {
+      const lista = document.getElementById('listaMiembros');
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+      lista.innerHTML = '';
+
+      usuarios.forEach((usuario, index) => {
+        const div = document.createElement('div');
+        div.className = 'user-entry';
+
+        const nombreUsuario = typeof usuario === 'object' ? usuario.nombre : usuario;
+        const nombreVisible = typeof usuario === 'object' ? usuario.nombreVisible || '(sin nombre)' : '';
+        const acceso = typeof usuario === 'object' ? usuario.acceso !== false : true;
+        const permisos = typeof usuario === 'object' && usuario.permisos ? usuario.permisos.join(', ') : 'Ninguno';
+
+        div.innerHTML = `
+          <strong>${nombreUsuario}</strong> - Nombre visible: ${nombreVisible}<br>
+          Permisos: ${permisos}<br>
+          Acceso: <span class="${acceso ? 'enabled' : 'disabled'}">${acceso ? 'Permitido' : 'Denegado'}</span><br>
+          <div class="user-controls">
+            <button onclick="agregarNombre(${index})">Agregar nombre visible</button>
+            <button onclick="asignarPermisos(${index})">Agregar permisos</button>
+            ${nombreUsuario !== 'admon' 
+              ? acceso 
+                ? `<button onclick="revocarAcceso(${index})">Quitar acceso</button>
+                   <button onclick="eliminarUsuario(${index})">Eliminar</button>`
+                : `<button onclick="darAcceso(${index})">Dar acceso</button>`
+              : '<em>No se puede modificar el administrador</em>'
+            }
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function agregarNombre(index) {
+      const nombreVisible = prompt('Ingresa el nombre visible para este usuario:');
+      if (!nombreVisible) return;
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      usuarios[index].nombreVisible = nombreVisible.trim();
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      cargarMiembros();
+    }
+
+    function asignarPermisos(index) {
+      const opciones = ['Acceso total', 'Discipulado', 'Ofrendas', 'Acceso normal'];
+      const seleccionados = prompt(
+        `Escribe los permisos separados por coma:\n${opciones.join(', ')}`
+      );
+
+      if (!seleccionados) return;
+
+      let permisos = seleccionados
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => opciones.includes(p));
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      usuarios[index].permisos = permisos;
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      cargarMiembros();
+    }
+
+    function revocarAcceso(index) {
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      usuarios[index].acceso = false;
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      cargarMiembros();
+    }
+
+    function darAcceso(index) {
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      usuarios[index].acceso = true;
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      cargarMiembros();
+    }
+
+    function eliminarUsuario(index) {
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      if (usuarios[index].nombre === 'admon') {
+        alert('No puedes eliminar al administrador.');
+        return;
+      }
+      if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+        usuarios.splice(index, 1);
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        cargarMiembros();
+      }
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('usuarioActual');
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>
