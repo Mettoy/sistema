@@ -2,266 +2,182 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Administrar Usuarios</title>
   <style>
+    /* Estilos base (puedes conservar los anteriores o copiar esto si partes de cero) */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f7f7f7;
       display: flex;
-      justify-content: flex-start;
-      padding-left: 220px;
-    }
-
-    .container {
-      background-color: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 600px;
-    }
-
-    h2 {
-      text-align: center;
-      color: #2c3e50;
+      background-color: #f7f7f7;
     }
 
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100%;
       width: 220px;
       background-color: #2c3e50;
-      padding-top: 20px;
-      padding-left: 20px;
       color: white;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+      height: 100vh;
+      padding: 20px;
     }
 
     .sidebar a {
+      display: block;
       color: white;
+      margin-bottom: 15px;
       text-decoration: none;
       font-size: 18px;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
     }
 
-    .sidebar a:hover {
-      background-color: #1abc9c;
-    }
-
-    .input-container {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      width: 80%;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    button {
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
-    }
-
-    .user-list {
-      margin-top: 30px;
+    .container {
+      padding: 40px;
+      flex-grow: 1;
     }
 
     .user-item {
-      display: flex;
-      justify-content: space-between;
-      background-color: #ecf0f1;
-      padding: 12px;
-      margin-bottom: 10px;
+      background: #ecf0f1;
+      padding: 15px;
       border-radius: 5px;
-      align-items: center;
+      margin-bottom: 10px;
     }
 
-    .user-item button {
+    .user-controls {
+      margin-top: 10px;
+    }
+
+    button {
+      margin-right: 8px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .remove {
       background-color: #e74c3c;
       color: white;
-      border: none;
-      padding: 5px 10px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 5px;
     }
 
-    .user-item button:hover {
-      background-color: #c0392b;
-    }
-
-    /* Permisos table */
-    .permissions-table {
-      margin-top: 10px;
-      display: none;
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .permissions-table th, .permissions-table td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-
-    .permissions-table th {
-      background-color: #2c3e50;
+    .toggle {
+      background-color: #3498db;
       color: white;
     }
 
-    .permissions-table td {
-      background-color: #ecf0f1;
-    }
-
-    .permissions-table tr:hover {
-      background-color: #bdc3c7;
-    }
-
-    .toggle-button {
-      background-color: #1abc9c;
+    .access-denied {
+      background-color: #f39c12;
       color: white;
-      border: none;
-      padding: 5px 10px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 5px;
     }
 
-    .toggle-button:hover {
-      background-color: #16a085;
+    .give-access {
+      background-color: #27ae60;
+      color: white;
     }
-
   </style>
 </head>
 <body>
-
-  <!-- Menú pegable -->
   <div class="sidebar">
-    <a href="agregar.html">Agregar Usuario</a>
+    <h2>Menú</h2>
     <a href="inicio.html">Inicio</a>
-    <a href="index.html">Cerrar Sesión</a>
+    <a href="agregar.html">Agregar Usuario</a>
   </div>
 
-  <!-- Contenido principal -->
   <div class="container">
-    <h2>Administrar Usuarios</h2>
+    <h2>Usuarios registrados</h2>
+    <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario">
+    <button onclick="agregarUsuario()">Agregar</button>
 
-    <!-- Agregar usuario -->
-    <div class="input-container">
-      <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario (sin espacios)">
-      <button onclick="agregarUsuario()">Agregar</button>
-    </div>
-
-    <!-- Lista de usuarios -->
-    <div class="user-list">
-      <h3>Usuarios registrados:</h3>
-      <ul id="listaUsuarios"></ul>
-    </div>
+    <div id="listaUsuarios"></div>
   </div>
 
   <script>
-    // Cargar usuarios al inicio
     function cargarUsuarios() {
-      const lista = document.getElementById('listaUsuarios');
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      const contenedor = document.getElementById("listaUsuarios");
+      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 
-      lista.innerHTML = ''; // Limpiar la lista
+      contenedor.innerHTML = "";
 
-      // Mostrar cada usuario en la lista
       usuarios.forEach((usuario, index) => {
-        const li = document.createElement('li');
-        li.classList.add('user-item');
-        let userName = usuario.nombre || usuario; // Mostrar nombre si está disponible
+        const div = document.createElement("div");
+        div.classList.add("user-item");
 
-        li.innerHTML = `${userName} 
-          <button class="toggle-button" onclick="mostrarOpciones(${index})">▼</button>
-          <div id="options-${index}" class="options" style="display: none;">
-            <button onclick="agregarNombre(${index})">Agregar Nombre</button>
-            <button onclick="asignarPermisos(${index})">Agregar Permisos</button>
-          </div>`;
+        const nombre = usuario.nombre || usuario;
+        const acceso = usuario.acceso !== false; // por defecto true
+        const permisos = usuario.permisos?.join(", ") || "Sin permisos";
 
-        lista.appendChild(li);
+        div.innerHTML = `
+          <strong>${nombre}</strong> - Permisos: ${permisos}<br>
+          Acceso: <span style="color:${acceso ? 'green' : 'red'};">${acceso ? 'Permitido' : 'Denegado'}</span>
+          <div class="user-controls">
+            <button class="toggle" onclick="agregarNombre(${index})">Agregar nombre</button>
+            <button class="toggle" onclick="asignarPermisos(${index})">Agregar permisos</button>
+            ${acceso 
+              ? `<button class="access-denied" onclick="revocarAcceso(${index})">Quitar acceso</button>`
+              : `<button class="give-access" onclick="darAcceso(${index})">Dar acceso</button>`
+            }
+          </div>
+        `;
+
+        contenedor.appendChild(div);
       });
     }
 
-    // Mostrar opciones de usuario
-    function mostrarOpciones(index) {
-      const opciones = document.getElementById(`options-${index}`);
-      if (opciones.style.display === 'none') {
-        opciones.style.display = 'block';
-      } else {
-        opciones.style.display = 'none';
-      }
-    }
-
-    // Función para agregar usuario
     function agregarUsuario() {
-      const input = document.getElementById('nuevoUsuario');
-      const usuario = input.value.trim().toLowerCase();
-
-      if (usuario === "") {
-        alert("Debes escribir un nombre de usuario.");
+      const input = document.getElementById("nuevoUsuario");
+      const nombre = input.value.trim().toLowerCase();
+      if (!nombre) {
+        alert("Debes ingresar un nombre");
         return;
       }
 
-      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+      let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
 
-      if (usuarios.find(u => u.nombre === usuario || u === usuario)) {
-        alert("El usuario ya está registrado.");
-      } else {
-        usuarios.push({ nombre: usuario, permisos: [] }); // Guardar usuario como objeto
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        input.value = "";
-        cargarUsuarios();
+      if (usuarios.find(u => u.nombre === nombre || u === nombre)) {
+        alert("Usuario ya existe");
+        return;
       }
+
+      usuarios.push({ nombre: nombre, permisos: [], acceso: true });
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      input.value = "";
+      cargarUsuarios();
     }
 
-    // Función para agregar nombre de usuario
     function agregarNombre(index) {
-      const nuevoNombre = prompt("Ingresa el nuevo nombre para el usuario:");
+      const nuevoNombre = prompt("Ingresa el nuevo nombre para este usuario:");
+      if (!nuevoNombre) return;
 
-      if (nuevoNombre) {
-        let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-        usuarios[index].nombre = nuevoNombre;
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        cargarUsuarios();
-      }
+      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+      usuarios[index].nombre = nuevoNombre.trim().toLowerCase();
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      cargarUsuarios();
     }
 
-    // Función para asignar permisos
     function asignarPermisos(index) {
-      const permisos = ['Acceso Total', 'Acceso Normal', 'Acceso Discipulado', 'Acceso Ofrendas'];
-      let permisosUsuario = prompt(`Asignar permisos al usuario:\n${permisos.join('\n')}`);
+      const opciones = ["Acceso Total", "Acceso Normal", "Discipulado", "Ofrendas"];
+      const seleccion = prompt(`Selecciona un permiso:\n${opciones.join("\n")}`);
+      if (!seleccion) return;
 
-      if (permisosUsuario) {
-        let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-        usuarios[index].permisos.push(permisosUsuario);
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        cargarUsuarios();
-      }
+      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+      if (!usuarios[index].permisos) usuarios[index].permisos = [];
+      usuarios[index].permisos.push(seleccion);
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      cargarUsuarios();
+    }
+
+    function revocarAcceso(index) {
+      const confirmacion = confirm("¿Estás seguro que quieres quitar el acceso a este usuario?");
+      if (!confirmacion) return;
+
+      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+      usuarios[index].acceso = false;
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      cargarUsuarios();
+    }
+
+    function darAcceso(index) {
+      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+      usuarios[index].acceso = true;
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      cargarUsuarios();
     }
 
     window.onload = cargarUsuarios;
