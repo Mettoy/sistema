@@ -62,18 +62,15 @@
 
   <script>
     function ingresar() {
-      const usuario = document.getElementById('usuario').value.trim();
+      const usuario = document.getElementById('usuario').value.trim().toLowerCase();
+      const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
 
       if (usuario === "") {
         alert("Por favor, ingresa un nombre de usuario.");
         return;
       }
 
-      // Aceptamos 'JMETTOY' o cualquier otro usuario para este ejemplo
-      // Si quieres que solo JMETTOY y los usuarios registrados pasen, necesitarás un backend o base de datos
-
-      // Si es JMETTOY (sin importar mayúsculas/minúsculas) o cualquier otro, redirige
-      if (usuario.toLowerCase() === "jmettoy" || usuario !== "") {
+      if (usuario === "jbenjamin" || usuariosRegistrados.includes(usuario)) {
         window.location.href = "inicio.html";
       } else {
         alert("Usuario no autorizado.");
@@ -82,4 +79,3 @@
   </script>
 </body>
 </html>
-
