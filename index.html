@@ -61,21 +61,23 @@
   </div>
 
   <script>
-    function ingresar() {
-      const usuario = document.getElementById('usuario').value.trim().toLowerCase();
-      const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
+    function verificarUsuario() {
+  const usuarioIngresado = document.getElementById('usuario').value.toLowerCase();
+  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-      if (usuario === "") {
-        alert("Por favor, ingresa un nombre de usuario.");
-        return;
-      }
+  // Buscar usuario por su campo .nombre
+  const existe = usuarios.some(u => 
+    (typeof u === 'string' && u === usuarioIngresado) || // por compatibilidad
+    (typeof u === 'object' && u.nombre === usuarioIngresado)
+  );
 
-      if (usuario === "jbenjamin" || usuariosRegistrados.includes(usuario)) {
-        window.location.href = "inicio.html";
-      } else {
-        alert("Usuario no autorizado.");
-      }
-    }
+  if (usuarioIngresado === 'jbenjamin' || existe) {
+    window.location.href = "inicio.html";
+  } else {
+    alert("Usuario sin acceso.");
+  }
+}
+
   </script>
 </body>
 </html>
