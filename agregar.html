@@ -1,183 +1,220 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Administrar Usuarios</title>
+  <meta charset="UTF-8" />
+  <title>Agregar Usuarios</title>
   <style>
-    /* Estilos base (puedes conservar los anteriores o copiar esto si partes de cero) */
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .topbar {
+      background-color: #2c3e50;
+      color: white;
+      padding: 12px 20px;
       display: flex;
-      background-color: #f7f7f7;
+      justify-content: space-between;
+      align-items: center;
+      height: 50px;
     }
 
     .sidebar {
       width: 220px;
-      background-color: #2c3e50;
+      background-color: #34495e;
+      position: fixed;
+      top: 50px;
+      bottom: 0;
+      left: 0;
+      padding-top: 20px;
       color: white;
-      height: 100vh;
-      padding: 20px;
     }
 
     .sidebar a {
       display: block;
+      padding: 12px 20px;
       color: white;
-      margin-bottom: 15px;
       text-decoration: none;
-      font-size: 18px;
+      transition: background 0.2s;
     }
 
-    .container {
-      padding: 40px;
-      flex-grow: 1;
+    .sidebar a:hover {
+      background-color: #3c5a72;
     }
 
-    .user-item {
-      background: #ecf0f1;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 10px;
+    .content {
+      margin-left: 240px;
+      padding: 30px;
     }
 
-    .user-controls {
-      margin-top: 10px;
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+      margin-right: 10px;
     }
 
     button {
-      margin-right: 8px;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
+      padding: 10px 15px;
+      font-size: 14px;
+      margin: 5px;
       cursor: pointer;
     }
 
-    .remove {
-      background-color: #e74c3c;
-      color: white;
+    .user-entry {
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
-    .toggle {
-      background-color: #3498db;
-      color: white;
+    .user-controls button {
+      margin-right: 5px;
     }
 
-    .access-denied {
-      background-color: #f39c12;
-      color: white;
+    .permisos-box {
+      margin-top: 10px;
     }
 
-    .give-access {
-      background-color: #27ae60;
-      color: white;
+    .disabled {
+      color: red;
+    }
+
+    .enabled {
+      color: green;
     }
   </style>
 </head>
 <body>
+
+  <div class="topbar">
+    <div>Gestión de Usuarios</div>
+  </div>
+
   <div class="sidebar">
-    <h2>Menú</h2>
     <a href="inicio.html">Inicio</a>
     <a href="agregar.html">Agregar Usuario</a>
   </div>
 
-  <div class="container">
-    <h2>Usuarios registrados</h2>
-    <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario">
+  <div class="content">
+    <h2>Agregar usuarios autorizados</h2>
+    <input type="text" id="nuevoUsuario" placeholder="Nombre de usuario (sin espacios)" />
     <button onclick="agregarUsuario()">Agregar</button>
 
+    <h3>Usuarios registrados:</h3>
     <div id="listaUsuarios"></div>
   </div>
 
   <script>
     function cargarUsuarios() {
-      const contenedor = document.getElementById("listaUsuarios");
-      const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+      const lista = document.getElementById('listaUsuarios');
+      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-      contenedor.innerHTML = "";
+      lista.innerHTML = '';
 
       usuarios.forEach((usuario, index) => {
-        const div = document.createElement("div");
-        div.classList.add("user-item");
+        const div = document.createElement('div');
+        div.className = 'user-entry';
 
-        const nombre = usuario.nombre || usuario;
-        const acceso = usuario.acceso !== false; // por defecto true
-        const permisos = usuario.permisos?.join(", ") || "Sin permisos";
+        const nombreUsuario = typeof usuario === 'object' ? usuario.nombre : usuario;
+        const nombreVisible = typeof usuario === 'object' ? usuario.nombreVisible || '(sin nombre)' : '';
+        const acceso = typeof usuario === 'object' ? usuario.acceso !== false : true;
+        const permisos = typeof usuario === 'object' && usuario.permisos ? usuario.permisos.join(', ') : 'Ninguno';
 
         div.innerHTML = `
-          <strong>${nombre}</strong> - Permisos: ${permisos}<br>
-          Acceso: <span style="color:${acceso ? 'green' : 'red'};">${acceso ? 'Permitido' : 'Denegado'}</span>
+          <strong>${nombreUsuario}</strong> - Nombre visible: ${nombreVisible}<br>
+          Permisos: ${permisos}<br>
+          Acceso: <span class="${acceso ? 'enabled' : 'disabled'}">${acceso ? 'Permitido' : 'Denegado'}</span><br>
           <div class="user-controls">
-            <button class="toggle" onclick="agregarNombre(${index})">Agregar nombre</button>
-            <button class="toggle" onclick="asignarPermisos(${index})">Agregar permisos</button>
-            ${acceso 
-              ? `<button class="access-denied" onclick="revocarAcceso(${index})">Quitar acceso</button>`
-              : `<button class="give-access" onclick="darAcceso(${index})">Dar acceso</button>`
+            <button onclick="agregarNombre(${index})">Agregar nombre</button>
+            <button onclick="asignarPermisos(${index})">Agregar permisos</button>
+            ${nombreUsuario !== 'admon' 
+              ? acceso 
+                ? `<button onclick="revocarAcceso(${index})">Quitar acceso</button>
+                   <button onclick="eliminarUsuario(${index})">Eliminar</button>`
+                : `<button onclick="darAcceso(${index})">Dar acceso</button>`
+              : '<em>No se puede modificar el administrador</em>'
             }
           </div>
         `;
-
-        contenedor.appendChild(div);
+        lista.appendChild(div);
       });
     }
 
     function agregarUsuario() {
-      const input = document.getElementById("nuevoUsuario");
-      const nombre = input.value.trim().toLowerCase();
-      if (!nombre) {
-        alert("Debes ingresar un nombre");
+      const input = document.getElementById('nuevoUsuario');
+      let usuario = input.value.trim().toLowerCase();
+      if (usuario === '') return alert('Debes escribir un nombre de usuario.');
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+      if (usuarios.some(u => typeof u === 'object' ? u.nombre === usuario : u === usuario)) {
+        alert('El usuario ya está registrado.');
         return;
       }
 
-      let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-
-      if (usuarios.find(u => u.nombre === nombre || u === nombre)) {
-        alert("Usuario ya existe");
-        return;
-      }
-
-      usuarios.push({ nombre: nombre, permisos: [], acceso: true });
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
-      input.value = "";
+      usuarios.push({ nombre: usuario, acceso: true, permisos: [], nombreVisible: '' });
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+      input.value = '';
       cargarUsuarios();
     }
 
     function agregarNombre(index) {
-      const nuevoNombre = prompt("Ingresa el nuevo nombre para este usuario:");
-      if (!nuevoNombre) return;
+      const nombreVisible = prompt('Ingresa el nombre visible para este usuario:');
+      if (!nombreVisible) return;
 
-      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
-      usuarios[index].nombre = nuevoNombre.trim().toLowerCase();
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      usuarios[index].nombreVisible = nombreVisible.trim();
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
       cargarUsuarios();
     }
 
     function asignarPermisos(index) {
-      const opciones = ["Acceso Total", "Acceso Normal", "Discipulado", "Ofrendas"];
-      const seleccion = prompt(`Selecciona un permiso:\n${opciones.join("\n")}`);
-      if (!seleccion) return;
+      const opciones = ['Acceso total', 'Discipulado', 'Ofrendas', 'Acceso normal'];
+      const seleccionados = prompt(
+        `Escribe los permisos separados por coma:\n${opciones.join(', ')}`
+      );
 
-      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
-      if (!usuarios[index].permisos) usuarios[index].permisos = [];
-      usuarios[index].permisos.push(seleccion);
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      if (!seleccionados) return;
+
+      let permisos = seleccionados
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => opciones.includes(p));
+
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      usuarios[index].permisos = permisos;
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
       cargarUsuarios();
     }
 
     function revocarAcceso(index) {
-      const confirmacion = confirm("¿Estás seguro que quieres quitar el acceso a este usuario?");
-      if (!confirmacion) return;
-
-      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
       usuarios[index].acceso = false;
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
       cargarUsuarios();
     }
 
     function darAcceso(index) {
-      let usuarios = JSON.parse(localStorage.getItem("usuarios"));
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
       usuarios[index].acceso = true;
-      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
       cargarUsuarios();
+    }
+
+    function eliminarUsuario(index) {
+      let usuarios = JSON.parse(localStorage.getItem('usuarios'));
+      if (usuarios[index].nombre === 'admon') {
+        alert('No puedes eliminar al administrador.');
+        return;
+      }
+      if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+        usuarios.splice(index, 1);
+        localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        cargarUsuarios();
+      }
     }
 
     window.onload = cargarUsuarios;
