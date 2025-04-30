@@ -75,16 +75,17 @@
       const usuarioIngresado = document.getElementById('usuario').value.trim().toLowerCase();
       const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-      const existe = usuarios.some(u =>
-        (typeof u === 'string' && u === usuarioIngresado) ||
-        (typeof u === 'object' && u.nombre === usuarioIngresado)
+      const puedeIngresar = usuarios.some(u =>
+        (typeof u === 'object' && u.nombre === usuarioIngresado && u.acceso !== false) ||
+        (typeof u === 'string' && u === usuarioIngresado) // Compatibilidad con usuarios antiguos
       );
 
-      // Solo jbenjamin es el administrador
-      if (usuarioIngresado === 'jbenjamin' || existe) {
+      if (usuarioIngresado === 'jbenjamin') {
+        window.location.href = 'inicio.html'; // admin siempre accede
+      } else if (puedeIngresar) {
         window.location.href = 'inicio.html';
       } else {
-        alert('Usuario inválido.');
+        alert('Acceso denegado. Usuario inválido o sin permiso.');
       }
     }
   </script>
