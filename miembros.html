@@ -57,6 +57,8 @@
 
     .search-box {
       margin-bottom: 20px;
+      display: flex;
+      align-items: center;
     }
 
     .search-box input {
@@ -64,6 +66,17 @@
       width: 300px;
       font-size: 16px;
       margin-right: 10px;
+    }
+
+    .search-box button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .search-box button img {
+      width: 20px;
+      height: 20px;
     }
 
     .add-member-button {
@@ -140,6 +153,12 @@
     .members-table td .delete-btn:hover {
       background-color: #c0392b;
     }
+
+    .members-table td .edit-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
   </style>
 </head>
 <body>
@@ -165,6 +184,7 @@
     <!-- Barra de búsqueda -->
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Buscar miembro..." onkeyup="filtrarMiembros()">
+      <button><img src="https://img.icons8.com/ios/50/000000/search.png" alt="Buscar"></button>
     </div>
 
     <!-- Botón para agregar miembro -->
@@ -204,14 +224,14 @@
 
         row.innerHTML = `
           <td><img src="${miembro.foto || 'https://via.placeholder.com/80'}" alt="Foto de ${miembro.nombre}"></td>
-          <td><input type="text" value="${miembro.nombre}" onchange="actualizarCampo(${index}, 'nombre', this.value)"></td>
-          <td><input type="text" value="${miembro.codigo}" onchange="actualizarCampo(${index}, 'codigo', this.value)"></td>
-          <td><input type="text" value="${miembro.genero}" onchange="actualizarCampo(${index}, 'genero', this.value)"></td>
-          <td><input type="text" value="${miembro.direccion}" onchange="actualizarCampo(${index}, 'direccion', this.value)"></td>
-          <td><input type="text" value="${miembro.asociacion}" onchange="actualizarCampo(${index}, 'asociacion', this.value)"></td>
-          <td><input type="text" value="${miembro.cargo}" onchange="actualizarCampo(${index}, 'cargo', this.value)"></td>
+          <td><input type="text" value="${miembro.nombre}" onchange="actualizarCampo(${index}, 'nombre', this.value)" disabled></td>
+          <td><input type="text" value="${miembro.codigo}" onchange="actualizarCampo(${index}, 'codigo', this.value)" disabled></td>
+          <td><input type="text" value="${miembro.genero}" onchange="actualizarCampo(${index}, 'genero', this.value)" disabled></td>
+          <td><input type="text" value="${miembro.direccion}" onchange="actualizarCampo(${index}, 'direccion', this.value)" disabled></td>
+          <td><input type="text" value="${miembro.asociacion}" onchange="actualizarCampo(${index}, 'asociacion', this.value)" disabled></td>
+          <td><input type="text" value="${miembro.cargo}" onchange="actualizarCampo(${index}, 'cargo', this.value)" disabled></td>
           <td>
-            <button class="edit-btn" onclick="editarFoto(${index})">Cambiar Foto</button>
+            <button class="edit-btn" onclick="editarMiembro(${index})">Editar</button>
             <button class="delete-btn" onclick="eliminarMiembro(${index})">X</button>
           </td>
         `;
@@ -248,19 +268,39 @@
       }
     }
 
-    // Cambiar foto de miembro
-    function editarFoto(index) {
-      const nuevoFoto = prompt('Introduce la URL de la nueva foto:');
-      if (nuevoFoto) {
-        miembros[index].foto = nuevoFoto;
-        localStorage.setItem('miembros', JSON.stringify(miembros));
-        cargarMiembros();
-      }
+    // Activar edición de miembro
+    function editarMiembro(index) {
+      const row = document.getElementById('membersList').getElementsByTagName('tr')[index];
+      const inputs = row.getElementsByTagName('input');
+      Array.from(inputs).forEach(input => input.disabled = false);
+
+      // Cambiar el texto del botón de "Editar" a "Guardar"
+      const editBtn = row.querySelector('.edit-btn');
+      editBtn.textContent = 'Guardar';
+      editBtn.setAttribute('onclick', `guardarEdicion(${index})`);
     }
 
-    // Mostrar formulario para agregar miembro (si es necesario)
-    function mostrarFormulario() {
-      // Aquí puedes agregar lógica si es necesario para mostrar un formulario adicional
+    // Guardar la edición de miembro
+    function guardarEdicion(index) {
+      const row = document.getElementById('membersList').getElementsByTagName('tr')[index];
+      const inputs = row.getElementsByTagName('input');
+
+      // Habilitar de nuevo los campos y guardar los cambios
+      Array.from(inputs).forEach(input => input.disabled = true);
+      const nombre = inputs[0].value;
+      const codigo = inputs[1].value;
+      const genero = inputs[2].value;
+      const direccion = inputs[3].value;
+      const asociacion = inputs[4].value;
+      const cargo = inputs[5].value;
+
+      miembros[index] = { ...miembros[index], nombre, codigo, genero, direccion, asociacion, cargo };
+      localStorage.setItem('miembros', JSON.stringify(miembros));
+
+      // Cambiar el texto del botón de "Guardar" a "Editar"
+      const editBtn = row.querySelector('.edit-btn');
+      editBtn.textContent = 'Editar';
+      editBtn.setAttribute('onclick', `editarMiembro(${index})`);
     }
 
     // Cerrar sesión
@@ -273,14 +313,10 @@
     window.onload = function () {
       cargarMiembros();
       const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
-      const span = document.getElementById('nombreUsuario');
-
-      if (usuario && usuario.nombreVisible) {
-        span.textContent = usuario.nombreVisible;
-      } else {
-        span.textContent = "Invitado";
+      if (usuario) {
+        document.getElementById('nombreUsuario').textContent = usuario.nombre;
       }
-    };
+    }
   </script>
 </body>
 </html>
