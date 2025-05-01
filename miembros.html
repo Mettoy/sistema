@@ -226,6 +226,20 @@
       cursor: pointer;
     }
 
+    /* Estilos para los botones de añadir foto */
+    .add-photo-btn {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-photo-btn:hover {
+      background-color: #3498db;
+    }
   </style>
 </head>
 <body>
@@ -278,24 +292,27 @@
     </table>
   </div>
 
-  <!-- Formulario emergente para agregar miembro -->
+  <!-- Formulario emergente para agregar o editar miembro -->
   <div class="form-overlay" id="formOverlay">
     <div class="form-container">
       <button class="close-btn" onclick="cerrarFormulario()">X</button>
-      <h3>Agregar Miembro</h3>
+      <h3>Editar Miembro</h3>
       <input type="text" id="nombre" placeholder="Nombre completo">
       <input type="text" id="codigo" placeholder="Código">
       <input type="text" id="genero" placeholder="Género">
       <input type="text" id="direccion" placeholder="Dirección">
       <input type="text" id="asociacion" placeholder="Asociación">
       <input type="text" id="cargo" placeholder="Cargo">
+      <div id="photoContainer"></div>
+      <button id="addPhotoButton" class="add-photo-btn" onclick="addPhoto()">Añadir Foto</button>
       <button class="save" onclick="guardarMiembro()">Guardar</button>
-      <button class="discard" onclick="cerrarFormulario()">Descartar</button>
+      <button class="discard" onclick="cerrarFormulario()">Cancelar</button>
     </div>
   </div>
 
   <script>
     let miembros = JSON.parse(localStorage.getItem('miembros')) || [];
+    let currentEditingIndex = -1; // Indica que no estamos editando ningún miembro
 
     // Cargar los miembros y mostrarlos en la tabla
     function cargarMiembros() {
@@ -328,12 +345,31 @@
       document.getElementById('formOverlay').style.display = 'flex';
     }
 
-    // Cerrar el formulario emergente
+    // Cerrar formulario
     function cerrarFormulario() {
       document.getElementById('formOverlay').style.display = 'none';
     }
 
-    // Guardar miembro
+    // Editar miembro
+    function editarMiembro(index) {
+      const miembro = miembros[index];
+      currentEditingIndex = index;
+
+      document.getElementById('nombre').value = miembro.nombre;
+      document.getElementById('codigo').value = miembro.codigo;
+      document.getElementById('genero').value = miembro.genero;
+      document.getElementById('direccion').value = miembro.direccion;
+      document.getElementById('asociacion').value = miembro.asociacion;
+      document.getElementById('cargo').value = miembro.cargo;
+
+      if (miembro.foto) {
+        document.getElementById('photoContainer').innerHTML = `<img src="${miembro.foto}" alt="Foto" width="80">`;
+      }
+
+      document.getElementById('formOverlay').style.display = 'flex';
+    }
+
+    // Guardar miembro (agregar o editar)
     function guardarMiembro() {
       const nombre = document.getElementById('nombre').value;
       const codigo = document.getElementById('codigo').value;
@@ -342,24 +378,24 @@
       const asociacion = document.getElementById('asociacion').value;
       const cargo = document.getElementById('cargo').value;
 
-      if (nombre && codigo && genero && direccion && asociacion && cargo) {
-        const nuevoMiembro = {
-          nombre,
-          codigo,
-          genero,
-          direccion,
-          asociacion,
-          cargo,
-          foto: 'https://via.placeholder.com/40',  // Foto por defecto
-        };
-
-        miembros.push(nuevoMiembro);
-        localStorage.setItem('miembros', JSON.stringify(miembros));
-        cargarMiembros();
-        cerrarFormulario();
-      } else {
+      if (!nombre || !codigo || !genero || !direccion || !asociacion || !cargo) {
         alert('Por favor, complete todos los campos.');
+        return;
       }
+
+      const foto = document.getElementById('photoContainer').querySelector('img') ? document.getElementById('photoContainer').querySelector('img').src : '';
+
+      if (currentEditingIndex === -1) {
+        // Agregar nuevo miembro
+        miembros.push({ nombre, codigo, genero, direccion, asociacion, cargo, foto });
+      } else {
+        // Editar miembro existente
+        miembros[currentEditingIndex] = { nombre, codigo, genero, direccion, asociacion, cargo, foto };
+      }
+
+      localStorage.setItem('miembros', JSON.stringify(miembros));
+      cargarMiembros();
+      cerrarFormulario();
     }
 
     // Eliminar miembro
@@ -386,8 +422,17 @@
       });
     }
 
-    // Cargar miembros al inicio
+    // Agregar foto al miembro
+    function addPhoto() {
+      const url = prompt('Ingrese el enlace de la foto:');
+      if (url) {
+        document.getElementById('photoContainer').innerHTML = `<img src="${url}" alt="Foto" width="80">`;
+      }
+    }
+
+    // Cargar los miembros cuando la página se cargue
     window.onload = cargarMiembros;
   </script>
+
 </body>
 </html>
