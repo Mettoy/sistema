@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usuarios</title>
+  <title>Miembros</title>
   <style>
     body {
       margin: 0;
@@ -66,8 +66,8 @@
       padding: 30px;
     }
 
-    /* Estilo de los cuadros de usuario */
-    .user-entry {
+    /* Estilo del cuadro de miembros */
+    .member-entry {
       background-color: #fff;
       padding: 20px;
       margin-bottom: 20px;
@@ -77,26 +77,22 @@
       align-items: center;
     }
 
-    .user-entry img {
+    .member-entry img {
       width: 80px;
       height: 80px;
       border-radius: 50%;
       margin-right: 20px;
     }
 
-    .user-details {
+    .member-details {
       flex-grow: 1;
     }
 
-    .user-details p {
+    .member-details p {
       margin: 5px 0;
     }
 
-    .user-details strong {
-      font-size: 16px;
-    }
-
-    .user-controls button {
+    .member-controls button {
       margin-right: 5px;
       padding: 8px 12px;
       background-color: #3498db;
@@ -106,24 +102,96 @@
       cursor: pointer;
     }
 
-    .user-controls button:hover {
+    .member-controls button:hover {
       background-color: #2980b9;
     }
 
-    /* Estilo del campo de búsqueda */
-    .search-box {
+    .member-status-button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .member-status-button:hover {
+      background-color: #2ecc71;
+    }
+
+    .member-status-button.deactivated {
+      background-color: #e74c3c;
+    }
+
+    .member-status-button.deactivated:hover {
+      background-color: #c0392b;
+    }
+
+    /* Estilo del formulario */
+    .form-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-top: 20px;
+    }
+
+    .form-container input,
+    .form-container select {
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .form-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .form-container button:hover {
+      background-color: #2980b9;
+    }
+
+    .cancel-button {
+      background-color: #e74c3c;
+    }
+
+    .cancel-button:hover {
+      background-color: #c0392b;
+    }
+
+    /* Botón de agregar miembro */
+    .add-member-button {
       margin-bottom: 20px;
+      padding: 10px 20px;
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
       display: flex;
-      justify-content: flex-start;
       align-items: center;
     }
 
-    .search-box input {
-      padding: 8px 12px;
-      font-size: 16px;
-      width: 300px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+    .add-member-button:hover {
+      background-color: #27ae60;
+    }
+
+    .add-member-button img {
+      margin-left: 10px;
+    }
+
+    /* Estilo de la lista de miembros */
+    .members-list {
+      display: flex;
+      flex-direction: column;
     }
   </style>
 </head>
@@ -131,147 +199,148 @@
 
   <!-- Barra superior -->
   <div class="topbar">
-    <div class="title">Gestión de Usuarios</div>
+    <div class="title">Gestión de Miembros</div>
     <div class="usuario">Bienvenido, <span id="nombreUsuario">...</span></div>
   </div>
 
   <!-- Menú lateral -->
   <div class="sidebar">
     <a href="inicio.html">Inicio</a>
-    <a href="usuarios.html">Usuarios</a>
-    <a href="agregar.html">Agregar Usuario</a>
+    <a href="miembros.html">Miembros</a>
+    <a href="agregar.html">Agregar Miembro</a>
     <button onclick="cerrarSesion()">Cerrar Sesión</button>
   </div>
 
   <!-- Contenido -->
   <div class="content">
-    <h2>Usuarios Registrados</h2>
+    <h2>Miembros Registrados</h2>
 
-    <!-- Campo de búsqueda -->
-    <div class="search-box">
-      <input type="text" id="buscarUsuario" placeholder="Buscar usuario..." oninput="buscarUsuarios()">
+    <!-- Botón para agregar miembro -->
+    <button class="add-member-button" onclick="mostrarFormulario()">
+      Agregar Miembro
+      <img src="https://img.icons8.com/ios/50/000000/user-plus.png" alt="Agregar Miembro" width="20" />
+    </button>
+
+    <!-- Contenedor para el formulario de agregar miembro -->
+    <div class="form-container" id="formContainer" style="display: none;">
+      <h3>Formulario de Miembro</h3>
+      <input type="text" id="nombre" placeholder="Nombre Completo" />
+      <input type="text" id="codigo" placeholder="Código" />
+      <input type="text" id="genero" placeholder="Género" />
+      <input type="text" id="direccion" placeholder="Dirección" />
+      <input type="text" id="asociacion" placeholder="Asociación" />
+      <input type="text" id="cargo" placeholder="Cargo" />
+      <button onclick="guardarMiembro()">Guardar</button>
+      <button class="cancel-button" onclick="cancelarFormulario()">Cancelar</button>
     </div>
 
-    <!-- Lista de usuarios -->
-    <div id="usuariosList"></div>
+    <!-- Lista de miembros -->
+    <div class="members-list" id="membersList"></div>
   </div>
 
   <script>
+    let miembros = JSON.parse(localStorage.getItem('miembros')) || [];
+
     window.onload = function () {
+      cargarMiembros();
       const usuario = JSON.parse(localStorage.getItem('usuarioActual'));
       const span = document.getElementById('nombreUsuario');
 
       if (usuario && usuario.nombreVisible) {
         span.textContent = usuario.nombreVisible;
-      } else if (usuario && usuario.nombre) {
-        span.textContent = usuario.nombre;
       } else {
         span.textContent = "Invitado";
       }
-
-      cargarUsuarios();
     };
 
-    // Cargar y mostrar los usuarios
-    function cargarUsuarios() {
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      const listaUsuarios = document.getElementById('usuariosList');
-      listaUsuarios.innerHTML = '';
-
-      usuarios.forEach((usuario, index) => {
+    // Cargar los miembros y mostrarlos
+    function cargarMiembros() {
+      const list = document.getElementById('membersList');
+      list.innerHTML = '';
+      miembros.forEach((miembro, index) => {
         const div = document.createElement('div');
-        div.className = 'user-entry';
-
-        const foto = usuario.foto || 'https://via.placeholder.com/80'; // Foto por defecto
+        div.className = 'member-entry';
 
         div.innerHTML = `
-          <img src="${foto}" alt="Foto de ${usuario.nombre}">
-          <div class="user-details">
-            <strong>${usuario.nombre}</strong>
-            <p><strong>Código:</strong> ${usuario.codigo}</p>
-            <p><strong>Género:</strong> ${usuario.genero}</p>
-            <p><strong>Dirección:</strong> ${usuario.direccion}</p>
-            <p><strong>Asociación:</strong> ${usuario.asociacion}</p>
-            <p><strong>Cargo:</strong> ${usuario.cargo}</p>
+          <img src="https://via.placeholder.com/80" alt="Foto de ${miembro.nombre}">
+          <div class="member-details">
+            <strong>${miembro.nombre}</strong>
+            <p><strong>Código:</strong> ${miembro.codigo}</p>
+            <p><strong>Género:</strong> ${miembro.genero}</p>
+            <p><strong>Dirección:</strong> ${miembro.direccion}</p>
+            <p><strong>Asociación:</strong> ${miembro.asociacion}</p>
+            <p><strong>Cargo:</strong> ${miembro.cargo}</p>
           </div>
-          <div class="user-controls">
-            <button onclick="verDetalles(${index})">Ver Detalles</button>
-            <button onclick="eliminarUsuario(${index})">Eliminar</button>
+          <div class="member-controls">
+            <button onclick="toggleEstado(${index})" class="member-status-button ${miembro.estado === 'de baja' ? 'deactivated' : ''}">
+              Estado: ${miembro.estado || 'Activo'}
+            </button>
+            <button onclick="eliminarMiembro(${index})" class="member-status-button" style="background-color: red;">X</button>
           </div>
         `;
-        listaUsuarios.appendChild(div);
+        list.appendChild(div);
       });
     }
 
-    // Función para filtrar usuarios por búsqueda
-    function buscarUsuarios() {
-      const filtro = document.getElementById('buscarUsuario').value.toLowerCase();
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      const listaUsuarios = document.getElementById('usuariosList');
-      listaUsuarios.innerHTML = '';
-
-      const usuariosFiltrados = usuarios.filter(usuario =>
-        usuario.nombre.toLowerCase().includes(filtro) ||
-        usuario.codigo.toLowerCase().includes(filtro)
-      );
-
-      usuariosFiltrados.forEach((usuario, index) => {
-        const div = document.createElement('div');
-        div.className = 'user-entry';
-
-        const foto = usuario.foto || 'https://via.placeholder.com/80';
-
-        div.innerHTML = `
-          <img src="${foto}" alt="Foto de ${usuario.nombre}">
-          <div class="user-details">
-            <strong>${usuario.nombre}</strong>
-            <p><strong>Código:</strong> ${usuario.codigo}</p>
-            <p><strong>Género:</strong> ${usuario.genero}</p>
-            <p><strong>Dirección:</strong> ${usuario.direccion}</p>
-            <p><strong>Asociación:</strong> ${usuario.asociacion}</p>
-            <p><strong>Cargo:</strong> ${usuario.cargo}</p>
-          </div>
-          <div class="user-controls">
-            <button onclick="verDetalles(${index})">Ver Detalles</button>
-            <button onclick="eliminarUsuario(${index})">Eliminar</button>
-          </div>
-        `;
-        listaUsuarios.appendChild(div);
-      });
+    // Mostrar el formulario para agregar un miembro
+    function mostrarFormulario() {
+      document.getElementById('formContainer').style.display = 'block';
     }
 
-    // Función para ver detalles de un usuario
-    function verDetalles(index) {
-      const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-      const usuario = usuarios[index];
-
-      alert(`
-        Nombre: ${usuario.nombre}
-        Código: ${usuario.codigo}
-        Género: ${usuario.genero}
-        Dirección: ${usuario.direccion}
-        Asociación: ${usuario.asociacion}
-        Cargo: ${usuario.cargo}
-        Foto: ${usuario.foto || 'No disponible'}
-      `);
+    // Cancelar el formulario
+    function cancelarFormulario() {
+      document.getElementById('formContainer').style.display = 'none';
     }
 
-    // Función para eliminar usuario
-    function eliminarUsuario(index) {
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
-      if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-        usuarios.splice(index, 1);
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        cargarUsuarios();
+    // Guardar el miembro
+    function guardarMiembro() {
+      const nombre = document.getElementById('nombre').value;
+      const codigo = document.getElementById('codigo').value;
+      const genero = document.getElementById('genero').value;
+      const direccion = document.getElementById('direccion').value;
+      const asociacion = document.getElementById('asociacion').value;
+      const cargo = document.getElementById('cargo').value;
+
+      if (nombre && codigo && genero && direccion && asociacion && cargo) {
+        miembros.push({
+          nombre,
+          codigo,
+          genero,
+          direccion,
+          asociacion,
+          cargo,
+          estado: 'activo'
+        });
+        localStorage.setItem('miembros', JSON.stringify(miembros));
+        cargarMiembros();
+        cancelarFormulario();
+      } else {
+        alert('Todos los campos son obligatorios');
       }
     }
 
-    // Función para cerrar sesión
+    // Eliminar miembro
+    function eliminarMiembro(index) {
+      if (confirm('¿Estás seguro de que deseas eliminar este miembro?')) {
+        miembros.splice(index, 1);
+        localStorage.setItem('miembros', JSON.stringify(miembros));
+        cargarMiembros();
+      }
+    }
+
+    // Cambiar el estado de un miembro
+    function toggleEstado(index) {
+      miembros[index].estado = miembros[index].estado === 'activo' ? 'de baja' : 'activo';
+      localStorage.setItem('miembros', JSON.stringify(miembros));
+      cargarMiembros();
+    }
+
+    // Cerrar sesión
     function cerrarSesion() {
       localStorage.removeItem('usuarioActual');
       window.location.href = 'index.html';
     }
   </script>
-
 </body>
 </html>
+
