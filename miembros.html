@@ -161,6 +161,71 @@
       cursor: not-allowed;
     }
 
+    /* Estilos para el formulario emergente */
+    .form-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      width: 400px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .form-container h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .form-container input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .form-container button {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    .form-container button.save {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .form-container button.discard {
+      background-color: red;
+      color: white;
+    }
+
+    .form-container .close-btn {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: red;
+      cursor: pointer;
+    }
+
   </style>
 </head>
 <body>
@@ -181,7 +246,7 @@
 
   <!-- Contenido -->
   <div class="content">
-    <h2>Miembros </h2>
+    <h2>Miembros Registrados</h2>
 
     <!-- Barra de búsqueda -->
     <div class="search-box">
@@ -191,7 +256,7 @@
       <!-- Botón de agregar miembro (al lado de la barra de búsqueda) -->
       <button class="add-member-button" onclick="mostrarFormulario()">
         Agregar Miembro
-        <img src=data:"image/png;base64,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" alt="Agregar Miembro" width="20" />
+        <img src="https://cdn-icons-png.flaticon.com/512/283/283234.png" alt="Agregar Miembro" width="20" />
       </button>
     </div>
 
@@ -213,6 +278,22 @@
     </table>
   </div>
 
+  <!-- Formulario emergente para agregar miembro -->
+  <div class="form-overlay" id="formOverlay">
+    <div class="form-container">
+      <button class="close-btn" onclick="cerrarFormulario()">X</button>
+      <h3>Agregar Miembro</h3>
+      <input type="text" id="nombre" placeholder="Nombre completo">
+      <input type="text" id="codigo" placeholder="Código">
+      <input type="text" id="genero" placeholder="Género">
+      <input type="text" id="direccion" placeholder="Dirección">
+      <input type="text" id="asociacion" placeholder="Asociación">
+      <input type="text" id="cargo" placeholder="Cargo">
+      <button class="save" onclick="guardarMiembro()">Guardar</button>
+      <button class="discard" onclick="cerrarFormulario()">Descartar</button>
+    </div>
+  </div>
+
   <script>
     let miembros = JSON.parse(localStorage.getItem('miembros')) || [];
 
@@ -225,90 +306,84 @@
         const row = document.createElement('tr');
 
         row.innerHTML = `
-          <td><img src="${miembro.foto || 'https://via.placeholder.com/80'}" alt="Foto de ${miembro.nombre}"></td>
-          <td><input type="text" value="${miembro.nombre}" onchange="actualizarCampo(${index}, 'nombre', this.value)" disabled></td>
-          <td><input type="text" value="${miembro.codigo}" onchange="actualizarCampo(${index}, 'codigo', this.value)" disabled></td>
-          <td><input type="text" value="${miembro.genero}" onchange="actualizarCampo(${index}, 'genero', this.value)" disabled></td>
-          <td><input type="text" value="${miembro.direccion}" onchange="actualizarCampo(${index}, 'direccion', this.value)" disabled></td>
-          <td><input type="text" value="${miembro.asociacion}" onchange="actualizarCampo(${index}, 'asociacion', this.value)" disabled></td>
-          <td><input type="text" value="${miembro.cargo}" onchange="actualizarCampo(${index}, 'cargo', this.value)" disabled></td>
+          <td><img src="${miembro.foto || 'https://via.placeholder.com/40'}" alt="Foto"></td>
+          <td>${miembro.nombre}</td>
+          <td>${miembro.codigo}</td>
+          <td>${miembro.genero}</td>
+          <td>${miembro.direccion}</td>
+          <td>${miembro.asociacion}</td>
+          <td>${miembro.cargo}</td>
           <td>
             <button class="edit-btn" onclick="editarMiembro(${index})">Editar</button>
             <button class="delete-btn" onclick="eliminarMiembro(${index})">X</button>
           </td>
         `;
+
         list.appendChild(row);
       });
     }
 
-    // Filtrar miembros por nombre
-    function filtrarMiembros() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const rows = document.getElementById('membersList').getElementsByTagName('tr');
-
-      Array.from(rows).forEach((row) => {
-        const nameCell = row.cells[1];
-        if (nameCell) {
-          const name = nameCell.textContent.toLowerCase();
-          row.style.display = name.includes(query) ? '' : 'none';
-        }
-      });
+    // Mostrar formulario de agregar miembro
+    function mostrarFormulario() {
+      document.getElementById('formOverlay').style.display = 'flex';
     }
 
-    // Actualizar campo de un miembro
-    function actualizarCampo(index, campo, valor) {
-      miembros[index][campo] = valor;
-      localStorage.setItem('miembros', JSON.stringify(miembros));
+    // Cerrar el formulario emergente
+    function cerrarFormulario() {
+      document.getElementById('formOverlay').style.display = 'none';
+    }
+
+    // Guardar miembro
+    function guardarMiembro() {
+      const nombre = document.getElementById('nombre').value;
+      const codigo = document.getElementById('codigo').value;
+      const genero = document.getElementById('genero').value;
+      const direccion = document.getElementById('direccion').value;
+      const asociacion = document.getElementById('asociacion').value;
+      const cargo = document.getElementById('cargo').value;
+
+      if (nombre && codigo && genero && direccion && asociacion && cargo) {
+        const nuevoMiembro = {
+          nombre,
+          codigo,
+          genero,
+          direccion,
+          asociacion,
+          cargo,
+          foto: 'https://via.placeholder.com/40',  // Foto por defecto
+        };
+
+        miembros.push(nuevoMiembro);
+        localStorage.setItem('miembros', JSON.stringify(miembros));
+        cargarMiembros();
+        cerrarFormulario();
+      } else {
+        alert('Por favor, complete todos los campos.');
+      }
     }
 
     // Eliminar miembro
     function eliminarMiembro(index) {
-      if (confirm('¿Estás seguro de que deseas eliminar este miembro?')) {
-        miembros.splice(index, 1);
-        localStorage.setItem('miembros', JSON.stringify(miembros));
-        cargarMiembros();
-      }
+      miembros.splice(index, 1);
+      localStorage.setItem('miembros', JSON.stringify(miembros));
+      cargarMiembros();
     }
 
-    // Activar edición de miembro
-    function editarMiembro(index) {
-      const row = document.getElementById('membersList').getElementsByTagName('tr')[index];
-      const inputs = row.getElementsByTagName('input');
-      Array.from(inputs).forEach(input => input.disabled = false);
+    // Filtrar miembros por búsqueda
+    function filtrarMiembros() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.getElementById('membersList').getElementsByTagName('tr');
+      Array.from(rows).forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        const nombre = cells[1].textContent.toLowerCase();
+        const codigo = cells[2].textContent.toLowerCase();
 
-      // Cambiar el texto del botón de "Editar" a "Guardar"
-      row.cells[7].querySelector('.edit-btn').textContent = 'Guardar';
-      row.cells[7].querySelector('.edit-btn').onclick = function() {
-        guardarEdicion(index);
-      };
-    }
-
-    // Guardar cambios de edición
-    function guardarEdicion(index) {
-      const row = document.getElementById('membersList').getElementsByTagName('tr')[index];
-      const inputs = row.getElementsByTagName('input');
-
-      Array.from(inputs).forEach(input => input.disabled = true);
-      row.cells[7].querySelector('.edit-btn').textContent = 'Editar';
-      row.cells[7].querySelector('.edit-btn').onclick = function() {
-        editarMiembro(index);
-      };
-
-      // Guardar cambios en localStorage
-      const miembro = miembros[index];
-      Array.from(inputs).forEach(input => {
-        const field = input.name || input.parentNode.textContent;
-        if (field) {
-          miembro[field] = input.value;
+        if (nombre.includes(searchInput) || codigo.includes(searchInput)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
         }
       });
-
-      localStorage.setItem('miembros', JSON.stringify(miembros));
-    }
-
-    // Mostrar formulario para agregar miembro
-    function mostrarFormulario() {
-      // Lógica para mostrar un formulario emergente para agregar un nuevo miembro
     }
 
     // Cargar miembros al inicio
