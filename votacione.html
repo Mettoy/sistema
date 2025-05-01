@@ -2,143 +2,102 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Votación</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Votaciones</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+      margin: 30px;
     }
-
-    .topbar {
-      background-color: #2c3e50;
-      color: white;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    table {
+      width: 50%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
     }
-
-    .sidebar {
-      width: 220px;
-      background-color: #34495e;
-      position: fixed;
-      top: 50px;
-      bottom: 0;
-      left: 0;
-      padding-top: 20px;
-      color: white;
-    }
-
-    .content {
-      margin-left: 240px;
-      padding: 30px;
-    }
-
-    .votacion-section {
-      margin-top: 30px;
-    }
-
-    .votacion-section h2 {
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
       text-align: center;
     }
-
-    .candidato {
-      background-color: white;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    th {
+      background-color: #f2f2f2;
     }
-
-    .candidato button {
-      background-color: #2ecc71;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 5px;
+    button {
+      padding: 8px 12px;
       cursor: pointer;
+      margin-right: 10px;
     }
-
-    .candidato button:hover {
-      background-color: #27ae60;
-    }
-
-    .results {
-      margin-top: 40px;
-      text-align: center;
+    #historial {
+      width: 60%;
+      border: 1px solid #aaa;
+      padding: 10px;
+      background-color: #fafafa;
     }
   </style>
 </head>
 <body>
 
-  <!-- Barra superior -->
-  <div class="topbar">
-    <h1>Votación</h1>
-  </div>
+  <h2>Panel de Votación</h2>
+  
+  <button onclick="iniciarVotacion()" id="btnIniciar">Iniciar Votación</button>
 
-  <!-- Menú lateral -->
-  <div class="sidebar">
-    <a href="inicio.html">Inicio</a>
-    <a href="miembros.html">Miembros</a>
-    <button onclick="cerrarSesion()">Cerrar Sesión</button>
-  </div>
+  <table id="tablaVotos">
+    <thead>
+      <tr>
+        <th>Candidato</th>
+        <th>Votos</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Juan Pérez</td>
+        <td id="votos-juan">0</td>
+        <td><button onclick="votar('juan')" disabled id="btn-juan">Votar</button></td>
+      </tr>
+      <tr>
+        <td>María Gómez</td>
+        <td id="votos-maria">0</td>
+        <td><button onclick="votar('maria')" disabled id="btn-maria">Votar</button></td>
+      </tr>
+      <tr>
+        <td>Luis Torres</td>
+        <td id="votos-luis">0</td>
+        <td><button onclick="votar('luis')" disabled id="btn-luis">Votar</button></td>
+      </tr>
+    </tbody>
+  </table>
 
-  <!-- Contenido -->
-  <div class="content">
-    <div class="votacion-section">
-      <h2>Postulados</h2>
-      <div id="candidatosList"></div>
-      <button onclick="verResultados()" style="background-color: #e74c3c; color: white; padding: 10px 20px; margin-top: 20px; cursor: pointer;">Ver Resultados</button>
-    </div>
-
-    <div class="results" id="results"></div>
+  <h3>Historial de Votaciones</h3>
+  <div id="historial">
+    <p><em>No hay votos registrados aún.</em></p>
   </div>
 
   <script>
-    const postulados = JSON.parse(localStorage.getItem('postulados')) || [];
-    let votos = JSON.parse(localStorage.getItem('votos')) || {};
-
-    // Mostrar los postulados
-    function cargarPostulados() {
-      const candidatosList = document.getElementById('candidatosList');
-      candidatosList.innerHTML = ''; // Limpiar la lista de candidatos
-
-      postulados.forEach((candidato, index) => {
-        const candidatoDiv = document.createElement('div');
-        candidatoDiv.classList.add('candidato');
-        candidatoDiv.innerHTML = `
-          <span>${candidato.nombre}</span>
-          <button onclick="votar(${index})">Votar</button>
-        `;
-        candidatosList.appendChild(candidatoDiv);
-      });
+    function iniciarVotacion() {
+      document.getElementById("btn-juan").disabled = false;
+      document.getElementById("btn-maria").disabled = false;
+      document.getElementById("btn-luis").disabled = false;
+      document.getElementById("btnIniciar").disabled = true;
     }
 
-    // Función para votar por un candidato
-    function votar(index) {
-      const candidato = postulados[index];
-      votos[candidato.nombre] = votos[candidato.nombre] ? votos[candidato.nombre] + 1 : 1;
-      localStorage.setItem('votos', JSON.stringify(votos));
-      alert(`Has votado por ${candidato.nombre}`);
-    }
+    function votar(candidato) {
+      const votosId = "votos-" + candidato;
+      let votosElemento = document.getElementById(votosId);
+      let votos = parseInt(votosElemento.textContent) + 1;
+      votosElemento.textContent = votos;
 
-    // Ver resultados de la votación
-    function verResultados() {
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = '<h3>Resultados de la votación:</h3>';
-      Object.keys(votos).forEach((nombre) => {
-        resultsDiv.innerHTML += `<p>${nombre}: ${votos[nombre]} votos</p>`;
-      });
-    }
+      const nombre = {
+        juan: "Juan Pérez",
+        maria: "María Gómez",
+        luis: "Luis Torres"
+      }[candidato];
 
-    // Cargar los postulados cuando la página se cargue
-    window.onload = cargarPostulados;
+      const historial = document.getElementById("historial");
+      const hora = new Date().toLocaleTimeString();
+      const nuevoRegistro = document.createElement("p");
+      nuevoRegistro.textContent = `🗳️ ${nombre} recibió un voto a las ${hora}.`;
+      historial.appendChild(nuevoRegistro);
+    }
   </script>
 
 </body>
