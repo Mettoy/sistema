@@ -5,74 +5,199 @@
   <title>Votaciones</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
     }
+
+    /* Estilo del menú lateral */
+    .sidebar {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #2c3e50;
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #ecf0f1;
+      display: block;
+      transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+      background-color: #34495e;
+    }
+
+    .sidebar .closebtn {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      font-size: 30px;
+    }
+
+    /* Botón para abrir el menú */
+    .openbtn {
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #2c3e50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+    }
+
+    .openbtn:hover {
+      background-color: #34495e;
+    }
+
+    /* Contenido principal */
+    #main {
+      transition: margin-left 0.3s;
+      padding: 20px;
+      margin-left: 0;
+    }
+
+    .container {
+      background-color: white;
+      margin: 30px auto;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 800px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
     table {
-      width: 50%;
+      width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
       margin-bottom: 20px;
     }
+
     th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
+      border: 1px solid #ddd;
+      padding: 12px;
       text-align: center;
     }
+
     th {
-      background-color: #f2f2f2;
+      background-color: #f0f0f0;
     }
+
     button {
-      padding: 8px 12px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      margin-right: 10px;
+      transition: background-color 0.3s ease;
     }
+
+    button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+    }
+
+    #btnIniciar {
+      display: block;
+      margin: 0 auto 20px auto;
+    }
+
     #historial {
-      width: 60%;
-      border: 1px solid #aaa;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #fefefe;
+      border: 1px solid #ccc;
       padding: 10px;
-      background-color: #fafafa;
+      border-radius: 5px;
+    }
+
+    #historial p {
+      margin: 5px 0;
     }
   </style>
 </head>
 <body>
 
-  <h2>Panel de Votación</h2>
-  
-  <button onclick="iniciarVotacion()" id="btnIniciar">Iniciar Votación</button>
+  <!-- Menú lateral -->
+  <div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+    <a href="inicio.html">Inicio</a>
+    <a href="votaciones.html">Votaciones</a>
+    <a href="#">Resultados</a>
+    <a href="#">Configuración</a>
+  </div>
 
-  <table id="tablaVotos">
-    <thead>
-      <tr>
-        <th>Candidato</th>
-        <th>Votos</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Juan Pérez</td>
-        <td id="votos-juan">0</td>
-        <td><button onclick="votar('juan')" disabled id="btn-juan">Votar</button></td>
-      </tr>
-      <tr>
-        <td>María Gómez</td>
-        <td id="votos-maria">0</td>
-        <td><button onclick="votar('maria')" disabled id="btn-maria">Votar</button></td>
-      </tr>
-      <tr>
-        <td>Luis Torres</td>
-        <td id="votos-luis">0</td>
-        <td><button onclick="votar('luis')" disabled id="btn-luis">Votar</button></td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Botón para abrir el menú -->
+  <div id="main">
+    <button class="openbtn" onclick="openNav()">☰ Menú</button>
 
-  <h3>Historial de Votaciones</h3>
-  <div id="historial">
-    <p><em>No hay votos registrados aún.</em></p>
+    <div class="container">
+      <h2>Panel de Votación</h2>
+
+      <button onclick="iniciarVotacion()" id="btnIniciar">Iniciar Votación</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Candidato</th>
+            <th>Votos</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Juan Pérez</td>
+            <td id="votos-juan">0</td>
+            <td><button onclick="votar('juan')" disabled id="btn-juan">Votar</button></td>
+          </tr>
+          <tr>
+            <td>María Gómez</td>
+            <td id="votos-maria">0</td>
+            <td><button onclick="votar('maria')" disabled id="btn-maria">Votar</button></td>
+          </tr>
+          <tr>
+            <td>Luis Torres</td>
+            <td id="votos-luis">0</td>
+            <td><button onclick="votar('luis')" disabled id="btn-luis">Votar</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Historial de Votaciones</h3>
+      <div id="historial">
+        <p><em>No hay votos registrados aún.</em></p>
+      </div>
+    </div>
   </div>
 
   <script>
+    function openNav() {
+      document.getElementById("mySidebar").style.width = "250px";
+      document.getElementById("main").style.marginLeft = "250px";
+    }
+
+    function closeNav() {
+      document.getElementById("mySidebar").style.width = "0";
+      document.getElementById("main").style.marginLeft= "0";
+    }
+
     function iniciarVotacion() {
       document.getElementById("btn-juan").disabled = false;
       document.getElementById("btn-maria").disabled = false;
